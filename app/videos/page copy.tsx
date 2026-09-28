@@ -1,4 +1,4 @@
-export default function TemoignagesPage() {
+export default function VideosPage() {
     const videoList = [
         {
             id: '1',
@@ -31,20 +31,20 @@ export default function TemoignagesPage() {
     ];
 
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 space-y-8 max-w-6xl mx-auto">
+        <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 space-y-8">
             <header className="max-w-4xl mx-auto text-center space-y-3">
                 <span className="text-xs font-semibold text-amber-500 uppercase tracking-widest">
                     Archives Audiovisuelles
                 </span>
-                <h1 className="text-3xl sm:text-4xl font-serif font-bold text-amber-500 border-b border-slate-800 pb-4">
-                    Témoignages audio & vidéo
+                <h1 className="text-3xl sm:text-4xl font-serif font-bold text-slate-100">
+                    Vidéos & Témoignages de la Lutte
                 </h1>
-                <p className="text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto">
-                    Collection d'entretiens, d'enregistrements sonores, de reportages et d'extraits vidéo retraçant l'histoire et les récits des acteurs du mouvement des sans-papiers de Saint-Bernard.
+                <p className="text-sm text-slate-400 max-w-2xl mx-auto">
+                    Retrouvez les reportages, documentaires et témoignages vidéo retraçant l'histoire du mouvement des sans-papiers de Saint-Bernard.
                 </p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
                 {videoList.map((video) => (
                     <div
                         key={video.id}

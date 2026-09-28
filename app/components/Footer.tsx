@@ -36,8 +36,8 @@ export function Footer() {
                     <ul className="space-y-1.5 text-xs">
                         <li><Link href="/archives/ina" className="hover:text-amber-400 transition inline-block py-0.5">Archives photographiques INA / Libres</Link></li>
                         <li><Link href="/videos" className="hover:text-amber-400 transition inline-block py-0.5">Témoignages audio & vidéo</Link></li>
-                        <li><Link href="/chronologie" className="hover:text-amber-400 transition inline-block py-0.5">Chronologie des lois Pasqua-Debré</Link></li>
-                        <li><Link href="/chercheurs" className="hover:text-amber-400 transition inline-block py-0.5">Espace chercheurs & étudiants</Link></li>
+                        <li><Link href="/chronologie-lois" className="hover:text-amber-400 transition inline-block py-0.5">Chronologie des lois Pasqua-Debré</Link></li>
+                        <li><Link href="/espace-chercheurs" className="hover:text-amber-400 transition inline-block py-0.5">Espace chercheurs & étudiants</Link></li>
                     </ul>
                 </div>
 

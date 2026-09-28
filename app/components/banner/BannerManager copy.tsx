@@ -12,74 +12,24 @@ export default function BannerManager({ initialBanners = [] }: BannerManagerProp
     const [banners, setBanners] = useState<BannerItem[]>(initialBanners);
     const [title, setTitle] = useState('');
     const [subtitle, setSubtitle] = useState('');
-    const [file, setFile] = useState<File | null>(null); // Remplacement de imageUrl par l'objet File
+    const [imageUrl, setImageUrl] = useState('');
     const [buttonText, setButtonText] = useState('');
     const [buttonUrl, setButtonUrl] = useState('');
     const [loading, setLoading] = useState(false);
 
     const supabase = createClient();
 
-    // Ajout d'une nouvelle bannière dans la table `banners` et téléversement Storage
+    // Ajout d'une nouvelle bannière dans la table `banners`
     const handleAddBanner = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!title || !file) return;
+        if (!title || !imageUrl) return;
 
         setLoading(true);
-
-        try {
-            // 1. Génération d'un nom de fichier unique
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `banners/${fileName}`;
-
-            // 2. Upload dans le bucket unique "memoires-saint-bernard" -> sous-dossier "banners"
-            const { error: uploadError } = await supabase.storage
-                .from('memoires-saint-bernard')
-                .upload(filePath, file);
-
-            if (uploadError) {
-                console.error("Erreur lors de l'upload:", uploadError.message);
-                setLoading(false);
-                return;
-            }
-
-            // 3. Récupération de l'URL publique
-            const { data: publicUrlData } = supabase.storage
-                .from('memoires-saint-bernard')
-                .getPublicUrl(filePath);
-
-            const publicUrl = publicUrlData.publicUrl;
-
-            // 4. Insertion dans la table `banners` de la base de données
-            const { data, error: insertError } = await supabase
-                .from('banners')
-                .insert([
-                    {
-                        title,
-                        subtitle,
-                        image_url: publicUrl,
-                        button_text: buttonText,
-                        button_url: buttonUrl,
-                    },
-                ])
-                .select();
-
-            if (insertError) {
-                console.error("Erreur BDD:", insertError.message);
-            } else if (data) {
-                setBanners((prev) => [...data, ...prev]);
-                // Réinitialisation des champs
-                setTitle('');
-                setSubtitle('');
-                setFile(null);
-                setButtonText('');
-                setButtonUrl('');
-            }
-        } catch (err) {
-            console.error('Erreur inattendue:', err);
-        } finally {
-            setLoading(false);
-        }
+        /* 
+        // Connexion Supabase :
+        // const { data, error } = await supabase.from('banners').insert([...]).select();
+        */
+        setLoading(false);
     };
 
     return (
@@ -119,13 +69,14 @@ export default function BannerManager({ initialBanners = [] }: BannerManagerProp
 
                 <div>
                     <label className="block text-xs font-semibold mb-1 text-slate-300">
-                        Image de la bannière *
+                        URL de l'image *
                     </label>
                     <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white file:mr-3 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-slate-950 hover:file:bg-amber-400 cursor-pointer"
+                        type="url"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="https://..."
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white"
                         required
                     />
                 </div>
@@ -163,7 +114,7 @@ export default function BannerManager({ initialBanners = [] }: BannerManagerProp
                         disabled={loading}
                         className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition-colors"
                     >
-                        {loading ? 'Téléversement...' : 'Ajouter la bannière'}
+                        {loading ? 'Enregistrement...' : 'Ajouter la bannière'}
                     </button>
                 </div>
             </form>
