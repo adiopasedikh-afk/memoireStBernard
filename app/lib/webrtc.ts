@@ -1,4 +1,4 @@
-import { createClient } from '@/src/lib/supabase/clients';
+import { createClient } from '@/app/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export type SignalType =
@@ -166,7 +166,7 @@ export function subscribeToPresence(
         });
         onPresenceUpdate(onlineSet);
       }
-    } catch {}
+    } catch { }
   }
 
   return () => {
@@ -174,9 +174,9 @@ export function subscribeToPresence(
     // On ne ferme le canal que si aucun composant n'écoute plus la présence
     if (presenceListeners.size === 0 && sharedPresenceChannel) {
       try {
-        sharedPresenceChannel.untrack().catch(() => {});
+        sharedPresenceChannel.untrack().catch(() => { });
         supabase.removeChannel(sharedPresenceChannel);
-      } catch {}
+      } catch { }
       sharedPresenceChannel = null;
       trackedUserEmail = null;
     }

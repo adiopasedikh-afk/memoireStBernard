@@ -1,4 +1,4 @@
-import { createClient } from '@/src/lib/supabase/clients';
+import { createClient } from '@/app/lib/supabase/client';
 
 export async function logUserConnection(email: string) {
   const cleanEmail = email.toLowerCase().trim();
@@ -13,7 +13,7 @@ export async function logUserConnection(email: string) {
     if (res.ok) {
       return;
     }
-  } catch {}
+  } catch { }
 
   // 2. Fallback direct via client Supabase
   try {
