@@ -10,6 +10,9 @@ export function createClient() {
 
   return createBrowserClient(
     url || 'https://placeholder.supabase.co',
-    key || 'placeholder-key'
+    key || 'placeholder-key',
+    {
+      db: { schema: 'saint_bernard' },
+    }
   );
 }

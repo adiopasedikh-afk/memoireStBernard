@@ -18,7 +18,9 @@ export async function POST(request: Request) {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            db: { schema: 'saint_bernard' },
+        });
 
         // Vérifiez que le nom de la table 'allowed_users' correspond exactement à celui dans Supabase
         const { data, error } = await supabase
