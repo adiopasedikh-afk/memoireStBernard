@@ -13,7 +13,7 @@ export function PwaRegister() {
 
   useEffect(() => {
     // 1. Enregistrement du Service Worker
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw.js')
@@ -29,6 +29,9 @@ export function PwaRegister() {
     // 2. Écoute de l'événement d'installation PWA
     const handleBeforeInstall = (e: Event) => {
       e.preventDefault();
+      if (typeof window !== 'undefined' && sessionStorage.getItem('pwa_dismissed') === 'true') {
+        return;
+      }
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setShowInstallBanner(true);
     };
@@ -51,6 +54,15 @@ export function PwaRegister() {
     setShowInstallBanner(false);
   };
 
+  const handleDismiss = () => {
+    setShowInstallBanner(false);
+    try {
+      sessionStorage.setItem('pwa_dismissed', 'true');
+    } catch {
+      // ignore
+    }
+  };
+
   if (!showInstallBanner) return null;
 
   return (
@@ -70,7 +82,7 @@ export function PwaRegister() {
           Installer
         </button>
         <button
-          onClick={() => setShowInstallBanner(false)}
+          onClick={handleDismiss}
           className="p-1 text-slate-400 hover:text-slate-200 text-xs cursor-pointer"
           aria-label="Fermer"
         >

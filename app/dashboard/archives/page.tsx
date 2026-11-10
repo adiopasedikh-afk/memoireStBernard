@@ -1,18 +1,17 @@
 'use client';
 
-export default function ArchivesPage() {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold font-serif text-slate-100">📁 Consultation des Archives</h1>
-                <p className="text-sm text-slate-400">Consultez les documents et archives mis à votre disposition.</p>
-            </div>
+'use client';
 
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-                <p className="text-slate-300 text-sm">
-                    [Lien 1 OK] Module de consultation des archives.
-                </p>
-            </div>
-        </div>
-    );
+import { useEffect, useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
+import ContributionContent from '@/app/components/ContributionContent';
+
+interface Archive { id: string; title: string; content: string; author_email: string | null; file_url: string | null; archived_at: string | null; created_at: string }
+
+export default function ArchivesPage() {
+    const [archives, setArchives] = useState<Archive[]>([]); const [search, setSearch] = useState(''); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
+    useEffect(() => { let cancelled=false; apiRequest<{data:Archive[]}>('/api/member/archives').then(({data})=>{if(!cancelled)setArchives(data)}).catch((e)=>{if(!cancelled)setError(e instanceof Error?e.message:'Impossible de charger les archives.')}).finally(()=>{if(!cancelled)setLoading(false)}); return()=>{cancelled=true}; }, []);
+    const filtered = archives.filter((archive)=>{const query=search.toLocaleLowerCase('fr-FR'); return archive.title.toLocaleLowerCase('fr-FR').includes(query)||(archive.author_email||'').toLocaleLowerCase('fr-FR').includes(query)});
+    const download = async (archive: Archive) => { const base=process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '')||''; const response=await fetch(`${base}/api/member/archives/${archive.id}/download`,{credentials:'include'}); if(!response.ok){setError('Le téléchargement de l’archive a échoué.');return} const blob=await response.blob(); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=`${archive.title}.pdf`; link.click(); URL.revokeObjectURL(url); };
+    return <div className="space-y-6"><div><h1 className="text-2xl font-bold font-serif text-slate-100">📁 Contributions / Archives</h1><p className="text-sm text-slate-400">Consultez les contributions archivées en lecture seule.</p></div><div className="rounded-2xl border border-slate-800 bg-slate-900 p-4"><input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Rechercher par titre ou auteur…" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm" /></div>{loading&&<p className="text-sm text-slate-400">Chargement des archives…</p>} {error&&<p role="alert" className="rounded-lg border border-rose-800 bg-rose-950 p-3 text-sm text-rose-200">{error}</p>} {!loading&&!error&&filtered.length===0&&<div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-sm text-slate-400">Aucune contribution archivée ne correspond à votre recherche.</div>}<div className="space-y-4">{filtered.map((archive)=><article key={archive.id} className="rounded-2xl border border-slate-800 bg-slate-900 p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-lg font-bold text-white">{archive.title}</h2><p className="mt-1 text-xs text-slate-400">{archive.author_email||'Auteur non précisé'} · {new Date(archive.archived_at||archive.created_at).toLocaleDateString('fr-FR')}</p></div><span className="rounded-full border border-emerald-700 bg-emerald-950 px-2 py-1 text-xs text-emerald-300">Lecture seule</span></div><ContributionContent content={archive.content} className="mt-4 text-sm text-slate-300" />{archive.file_url&&<button type="button" onClick={()=>download(archive)} className="mt-4 rounded-lg border border-amber-700 px-3 py-2 text-xs font-bold text-amber-300 hover:bg-amber-950">Télécharger le document</button>}</article>)}</div></div>;
 }

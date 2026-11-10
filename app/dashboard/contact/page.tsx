@@ -1,18 +1,10 @@
 'use client';
 
-export default function ContactAdminPage() {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold font-serif text-slate-100">✉️ Envoyer un Message à l'Admin</h1>
-                <p className="text-sm text-slate-400">Transmettez votre message directement à l'administrateur du site.</p>
-            </div>
+import { useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
 
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-                <p className="text-slate-300 text-sm">
-                    [Lien 4 OK] Formulaire d'envoi de message à l'administrateur.
-                </p>
-            </div>
-        </div>
-    );
+export default function ContactAdminPage() {
+  const [subject, setSubject] = useState(''); const [message, setMessage] = useState(''); const [status, setStatus] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
+  const submit = async (event: React.FormEvent) => { event.preventDefault(); setStatus(''); setError(''); if (!subject.trim() || !message.trim()) { setError('Le sujet et le message sont requis.'); return; } setLoading(true); try { await apiRequest('/api/member/messages', { method: 'POST', body: JSON.stringify({ subject: subject.trim(), message: message.trim() }) }); setStatus('Votre message a été envoyé à l’administrateur.'); setSubject(''); setMessage(''); } catch (e) { setError(e instanceof Error ? e.message : 'Envoi impossible.'); } finally { setLoading(false); } };
+  return <div className="space-y-6"><div><h1 className="text-2xl font-bold font-serif text-slate-100">✉️ Contacter l’administrateur</h1><p className="text-sm text-slate-400">Votre message est privé et transmis uniquement à l’administrateur.</p></div><form onSubmit={submit} className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6"><label className="block text-sm">Sujet<input value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={255} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" /></label><label className="block text-sm">Message<textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={8} maxLength={10000} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" /></label>{status && <p role="status" className="rounded-lg border border-emerald-700 bg-emerald-950 p-3 text-sm text-emerald-200">{status}</p>}{error && <p role="alert" className="rounded-lg border border-rose-700 bg-rose-950 p-3 text-sm text-rose-200">{error}</p>}<button disabled={loading} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold disabled:opacity-50">{loading ? 'Envoi...' : 'Envoyer le message'}</button></form></div>;
 }

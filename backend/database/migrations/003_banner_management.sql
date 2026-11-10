@@ -1,0 +1,6 @@
+ALTER TABLE banners
+    ADD COLUMN duration_type VARCHAR(20) NOT NULL DEFAULT 'month',
+    ADD COLUMN starts_at DATETIME NULL,
+    ADD COLUMN ends_at DATETIME NULL,
+    ADD COLUMN price_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    ADD COLUMN payment_status VARCHAR(20) NOT NULL DEFAULT 'paid';

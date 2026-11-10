@@ -1,4 +1,4 @@
-const CACHE_NAME = 'st-bernard-v1';
+const CACHE_NAME = 'st-bernard-v5';
 
 const STATIC_ASSETS = [
   '/',
@@ -39,9 +39,9 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  // On ignore les requêtes non GET ou d'API externe / Supabase
+  // On ignore les requêtes non GET et toutes les API dynamiques
   if (request.method !== 'GET') return;
-  if (request.url.includes('/api/') || request.url.includes('supabase') || request.url.includes('stripe')) {
+  if (request.url.includes('/api/')) {
     return;
   }
 

@@ -1,34 +1,67 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
+
+interface VideoItem {
+    id: string;
+    title: string;
+    youtube_id?: string;
+    youtubeId?: string;
+    description?: string | null;
+    badge_date?: string;
+    date?: string;
+}
+
+const FALLBACK_VIDEOS: VideoItem[] = [
+    {
+        id: '1',
+        title: 'La Ballade des sans-papiers',
+        youtube_id: 'kNjVJoYhc84',
+        description: 'Documentaire retraçant le mouvement des sans-papiers de Saint-Bernard.',
+        badge_date: 'Archive 1996',
+    },
+    {
+        id: '2',
+        title: 'Les sans-papiers après Saint-Bernard',
+        youtube_id: 'mLoafEv9Vqo',
+        description: 'Reportage d’époque sur les suites du mouvement après l’évacuation.',
+        badge_date: 'Archive INA',
+    },
+    {
+        id: '3',
+        title: '2ᵉ anniversaire des sans-papiers à l\'église St-Bernard',
+        youtube_id: 'lUzwQ59nzuQ',
+        description: 'Rassemblement de commémoration devant l’église Saint-Bernard.',
+        badge_date: 'Archive INA',
+    },
+    {
+        id: '4',
+        title: '30 ans de l\'occupation de l\'église Saint-Bernard',
+        youtube_id: 'wlsK4MIzu1U',
+        description: 'Anzoumane Sissoko sur l’histoire et l’impact de la lutte.',
+        badge_date: 'Témoignage',
+    },
+];
+
 export default function TemoignagesPage() {
-    const videoList = [
-        {
-            id: '1',
-            title: 'La Ballade des sans-papiers',
-            youtubeId: 'kNjVJoYhc84', // ID YouTube de l'archive agenceIMmedia
-            description: 'Documentaire retraçant le mouvement des sans-papiers de Saint-Bernard.',
-            date: 'Archive 1996',
-        },
-        {
-            id: '2',
-            title: 'Les sans-papiers après Saint-Bernard',
-            youtubeId: 'mLoafEv9Vqo', // ID YouTube de l'archive INA
-            description: 'Reportage d’époque sur les suites du mouvement après l’évacuation.',
-            date: 'Archive INA',
-        },
-        {
-            id: '3',
-            title: '2ᵉ anniversaire des sans-papiers à l\'église St-Bernard',
-            youtubeId: 'lUzwQ59nzuQ', // ID YouTube de l'archive INA
-            description: 'Rassemblement de commémoration devant l’église Saint-Bernard.',
-            date: 'Archive INA',
-        },
-        {
-            id: '4',
-            title: '30 ans de l\'occupation de l\'église Saint-Bernard',
-            youtubeId: 'wlsK4MIzu1U', // ID YouTube de l'interview
-            description: 'Anzoumane Sissoko sur l’histoire et l’impact de la lutte.',
-            date: 'Témoignage',
-        },
-    ];
+    const [videos, setVideos] = useState<VideoItem[]>(FALLBACK_VIDEOS);
+
+    useEffect(() => {
+        let active = true;
+        async function fetchVideos() {
+            try {
+                const res = await apiRequest<{ data: VideoItem[] }>('/api/videos');
+                if (active && res.data && res.data.length > 0) {
+                    setVideos(res.data);
+                }
+            } catch {
+                // Keep fallback on error
+            }
+        }
+        fetchVideos();
+        return () => { active = false; };
+    }, []);
 
     return (
         <main className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-12 space-y-8 max-w-6xl mx-auto">
@@ -45,36 +78,42 @@ export default function TemoignagesPage() {
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                {videoList.map((video) => (
-                    <div
-                        key={video.id}
-                        className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between"
-                    >
-                        <div className="relative aspect-video w-full bg-black">
-                            <iframe
-                                src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}`}
-                                title={video.title}
-                                className="absolute top-0 left-0 w-full h-full border-0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                            />
-                        </div>
+                {videos.map((video) => {
+                    const yId = video.youtube_id || video.youtubeId;
+                    const dateBadge = video.badge_date || video.date || 'Archive';
+                    return (
+                        <div
+                            key={video.id}
+                            className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between"
+                        >
+                            <div className="relative aspect-video w-full bg-black">
+                                <iframe
+                                    src={`https://www.youtube-nocookie.com/embed/${yId}`}
+                                    title={video.title}
+                                    className="absolute top-0 left-0 w-full h-full border-0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                />
+                            </div>
 
-                        <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
-                            <div>
-                                <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2.5 py-0.5 rounded-full">
-                                    {video.date}
-                                </span>
-                                <h2 className="text-lg font-bold text-slate-100 mt-2">
-                                    {video.title}
-                                </h2>
-                                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                                    {video.description}
-                                </p>
+                            <div className="p-5 space-y-2 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <span className="text-[10px] font-bold text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2.5 py-0.5 rounded-full">
+                                        {dateBadge}
+                                    </span>
+                                    <h2 className="text-lg font-bold text-slate-100 mt-2">
+                                        {video.title}
+                                    </h2>
+                                    {video.description && (
+                                        <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                                            {video.description}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </main>
     );

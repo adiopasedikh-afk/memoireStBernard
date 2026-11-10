@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-// Adresse de l'administrateur
-const ADMIN_EMAIL = 'adiopasedikh@gmail.com';
+import { apiRequest } from '@/app/lib/api';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -18,42 +17,14 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            // 1. Interrogation de la route de validation
-            const res = await fetch('/api/validate-email', {
+            const result = await apiRequest<{ user: { role: string } }>('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, password }),
             });
 
-            const data = await res.json();
-
-            if (!res.ok || !data.isValid) {
-                setErrorMsg(data.error || 'E-mail invalide ou inexistant.');
-                setLoading(false);
-                return;
-            }
-
-            const userEmailClean = data.email.toLowerCase().trim();
-
-            // 2. Stockage LocalStorage
-            localStorage.setItem('user_email', userEmailClean);
-            localStorage.setItem('user_login_time', new Date().toISOString());
-
-            // 3. Vérification du rôle et redirection
-            if (userEmailClean === ADMIN_EMAIL.toLowerCase()) {
-                // Définition des cookies nécessaires pour déverrouiller app/admin/page.tsx
-                document.cookie = `yam_user_email=${encodeURIComponent(userEmailClean)}; path=/; max-age=86400`;
-                document.cookie = `yam_admin_2fa=verified; path=/; max-age=86400`;
-
-                // Redirection vers l'Admin
-                router.push('/admin');
-            } else {
-                // Redirection vers le Dashboard Utilisateur
-                router.push('/dashboard');
-            }
-
-        } catch (err) {
-            setErrorMsg('Erreur réseau lors de la vérification de l\'adresse e-mail.');
+            router.push(result.user.role === 'admin' ? '/admin' : '/dashboard');
+        } catch (error) {
+            setErrorMsg(error instanceof Error ? error.message : 'Erreur réseau lors de la connexion.');
         } finally {
             setLoading(false);
         }
@@ -68,7 +39,7 @@ export default function LoginPage() {
                         Accès Espace Privé
                     </h1>
                     <p className="text-xs text-slate-400">
-                        Saisissez votre e-mail pour accéder à votre espace.
+                        Connectez-vous avec votre e-mail et votre mot de passe.
                     </p>
                 </div>
 
@@ -90,6 +61,23 @@ export default function LoginPage() {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-xs font-semibold text-slate-300 mb-1">
+                            Mot de passe
+                        </label>
+                        <input
+                            type="password"
+                            required
+                            autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                if (errorMsg) setErrorMsg('');
+                            }}
+                            className="w-full rounded-xl bg-slate-950 border border-slate-800 px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition"
+                        />
+                    </div>
+
                     {errorMsg && (
                         <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs font-medium">
                             ⚠️ {errorMsg}
@@ -98,10 +86,10 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        disabled={loading || !email}
+                        disabled={loading || !email || !password}
                         className="w-full py-3.5 rounded-xl font-bold text-white bg-amber-600 hover:bg-amber-500 transition shadow-lg text-sm cursor-pointer disabled:opacity-50"
                     >
-                        {loading ? 'Vérification en cours...' : 'Accéder à mon espace →'}
+                        {loading ? 'Connexion en cours...' : 'Accéder à mon espace →'}
                     </button>
                 </form>
             </div>

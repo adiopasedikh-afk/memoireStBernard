@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { apiRequest, clearApiSession } from '@/app/lib/api';
 
 const MENU_ITEMS = [
-    { label: 'Consultation Archives', href: '/dashboard/archives', icon: '📁' },
+    { label: 'Contributions / Archives', href: '/dashboard/archives', icon: '📁' },
     { label: 'Uploader Archives', href: '/dashboard/upload', icon: '📤' },
     { label: 'Faire un Don (Stripe)', href: '/dashboard/don', icon: '💳' },
     { label: 'Envoyer un Message', href: '/dashboard/contact', icon: '✉️' },
@@ -15,24 +16,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const router = useRouter();
     const pathname = usePathname();
     const [userEmail, setUserEmail] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        const email = localStorage.getItem('user_email');
-        if (!email) {
-            router.push('/login');
-        } else {
-            setUserEmail(email);
-        }
+        let cancelled = false;
+        apiRequest<{ user: { email: string; role: string } }>('/api/auth/me')
+            .then(({ user }) => {
+                if (cancelled) return;
+                if (user.role === 'admin') {
+                    router.replace('/admin');
+                    return;
+                }
+                setUserEmail(user.email);
+            })
+            .catch(() => {
+                if (!cancelled) router.replace('/login');
+            });
+        return () => {
+            cancelled = true;
+        };
     }, [router]);
 
-    const handleLogout = () => {
-        // Nettoyage complet
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_login_time');
-        document.cookie = 'user_email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-
-        // Redirection vers login
-        router.push('/login');
+    const handleLogout = async () => {
+        setErrorMessage('');
+        try {
+            await apiRequest('/api/auth/logout', { method: 'POST' });
+            clearApiSession();
+            router.replace('/login');
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : 'La déconnexion a échoué.');
+        }
     };
 
     if (!userEmail) {
@@ -77,6 +90,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 {/* Bouton de Déconnexion */}
                 <div className="pt-6 border-t border-slate-800 mt-6">
+                    {errorMessage && <p role="alert" className="mb-3 text-xs text-rose-300">{errorMessage}</p>}
                     <button
                         onClick={handleLogout}
                         type="button"

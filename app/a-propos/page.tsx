@@ -33,7 +33,7 @@ export default function AProposPage() {
                 <div className="border-t border-slate-800 pt-6">
                     <h2 className="text-xl font-serif font-bold text-amber-400 mb-3">Accès Ouvert & Éducatif</h2>
                     <p>
-                        L'ensemble des documents présentés dans la Galerie des Glaces et la section Destins est mis à disposition dans un cadre pédagogique, d'information citoyenne et de recherche historique.
+                        L'ensemble des documents présentés dans la Galerie des Sans-Papiers et la section Destins est mis à disposition dans un cadre pédagogique, d'information citoyenne et de recherche historique.
                     </p>
                 </div>
             </div>

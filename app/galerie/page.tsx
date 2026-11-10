@@ -1,8 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
 
-const ARCHIVES = [
+interface ArchiveItem {
+    id: string;
+    title: string;
+    type: 'photo' | 'video' | 'document' | string;
+    category: string;
+    url: string;
+    description?: string | null;
+}
+
+const FALLBACK_ARCHIVES: ArchiveItem[] = [
     {
         id: '1',
         title: "L'assaut de la porte arrière de l'église",
@@ -39,8 +49,25 @@ const ARCHIVES = [
 
 export default function GaleriePage() {
     const [filter, setFilter] = useState('all');
+    const [items, setItems] = useState<ArchiveItem[]>(FALLBACK_ARCHIVES);
 
-    const filtered = filter === 'all' ? ARCHIVES : ARCHIVES.filter(a => a.type === filter);
+    useEffect(() => {
+        let active = true;
+        async function fetchGallery() {
+            try {
+                const res = await apiRequest<{ data: ArchiveItem[] }>('/api/gallery');
+                if (active && res.data && res.data.length > 0) {
+                    setItems(res.data);
+                }
+            } catch {
+                // Keep fallback on error
+            }
+        }
+        fetchGallery();
+        return () => { active = false; };
+    }, []);
+
+    const filtered = filter === 'all' ? items : items.filter(a => a.type === filter);
 
     return (
         <main className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -49,7 +76,7 @@ export default function GaleriePage() {
                     Espace Mémoriel & Archives Libre Accès
                 </span>
                 <h1 className="text-4xl font-serif font-bold text-stone-100 mb-4">
-                    La Galerie des Glaces
+                    La Galerie des Sans-Papiers
                 </h1>
                 <p className="text-slate-400 text-sm leading-relaxed">
                     Parcourez la mémoire visuelle, sonore et documentaire des événements de 1996. Tout le matériel visuel et historique archivé y est rendu accessible.

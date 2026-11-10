@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
 
 export default function FaireUnDonPage() {
     const [selectedAmount, setSelectedAmount] = useState<number | null>(10);
@@ -19,24 +20,14 @@ export default function FaireUnDonPage() {
         setLoading(true);
 
         try {
-            const response = await fetch('/api/checkout', {
+            const data = await apiRequest<{ url: string }>('/api/stripe/checkout', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ amount: amountToPay }),
             });
 
-            const data = await response.json();
-
-            if (data.url) {
-                // Redirection vers la page de paiement sécurisée Stripe Checkout
-                window.location.href = data.url;
-            } else {
-                alert(data.error || 'Une erreur est survenue.');
-                setLoading(false);
-            }
+            window.location.href = data.url;
         } catch (error) {
-            console.error(error);
-            alert('Impossible de contacter le serveur de paiement.');
+            alert(error instanceof Error ? error.message : 'Impossible de contacter le serveur de paiement.');
             setLoading(false);
         }
     };

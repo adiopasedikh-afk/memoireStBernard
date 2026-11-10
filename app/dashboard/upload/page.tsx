@@ -1,18 +1,10 @@
 'use client';
 
-export default function UploadPage() {
-    return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold font-serif text-slate-100">📤 Uploader des Archives</h1>
-                <p className="text-sm text-slate-400">Déposez un fichier. Seul l'administrateur aura accès à ce dossier.</p>
-            </div>
+import { useRef, useState } from 'react';
+import { apiRequest } from '@/app/lib/api';
 
-            <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-                <p className="text-slate-300 text-sm">
-                    [Lien 2 OK] Module d'upload de fichiers réservé à l'administrateur.
-                </p>
-            </div>
-        </div>
-    );
+export default function UploadPage() {
+    const [title, setTitle] = useState(''); const [file, setFile] = useState<File | null>(null); const [status, setStatus] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(false); const inputRef = useRef<HTMLInputElement>(null);
+    const submit = async (event: React.FormEvent) => { event.preventDefault(); setStatus(''); setError(''); if (!title.trim() || !file) { setError('Indiquez un titre et choisissez un fichier.'); return; } if (file.size > 8 * 1024 * 1024) { setError('Le fichier ne doit pas dépasser 8 Mo.'); return; } const form = new FormData(); form.append('title', title.trim()); form.append('file', file); setLoading(true); try { await apiRequest('/api/member/uploads', { method: 'POST', body: form }); setStatus('Fichier envoyé à l’administrateur.'); setTitle(''); setFile(null); if (inputRef.current) inputRef.current.value = ''; } catch (e) { setError(e instanceof Error ? e.message : 'Envoi impossible.'); } finally { setLoading(false); } };
+    return <div className="space-y-6"><div><h1 className="text-2xl font-bold font-serif text-slate-100">📤 Envoyer un fichier</h1><p className="text-sm text-slate-400">Texte, image ou PDF, jusqu’à 8 Mo. Seul l’administrateur reçoit ce fichier.</p></div><form onSubmit={submit} className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6"><label className="block text-sm">Titre du fichier<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" /></label><label className="block text-sm">Fichier<input ref={inputRef} type="file" accept=".txt,.pdf,.jpg,.jpeg,.png,.gif,.webp,image/*,application/pdf,text/plain" onChange={(e) => setFile(e.target.files?.[0] || null)} className="mt-2 block w-full text-sm" /></label>{status && <p role="status" className="rounded-lg border border-emerald-700 bg-emerald-950 p-3 text-sm text-emerald-200">{status}</p>}{error && <p role="alert" className="rounded-lg border border-rose-700 bg-rose-950 p-3 text-sm text-rose-200">{error}</p>}<button disabled={loading} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold disabled:opacity-50">{loading ? 'Envoi...' : 'Envoyer à l’administrateur'}</button></form></div>;
 }

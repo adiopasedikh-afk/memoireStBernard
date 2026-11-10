@@ -28,7 +28,7 @@ export function Navbar() {
                         Accueil
                     </Link>
                     <Link href="/galerie" className="text-slate-300 hover:text-amber-400 transition-colors flex items-center gap-1">
-                        <span>✨</span> Galerie des Glaces
+                        <span>✨</span> Galerie des Sans-Papiers
                     </Link>
                     <Link href="/destins" className="text-slate-300 hover:text-amber-400 transition-colors flex items-center gap-1">
                         <span>👥</span> Destins
@@ -72,7 +72,7 @@ export function Navbar() {
                         Accueil
                     </Link>
                     <Link href="/galerie" onClick={() => setMobileMenuOpen(false)} className="block text-slate-300 hover:text-amber-400 py-1">
-                        ✨ Galerie des Glaces
+                        ✨ Galerie des Sans-Papiers
                     </Link>
                     <Link href="/destins" onClick={() => setMobileMenuOpen(false)} className="block text-slate-300 hover:text-amber-400 py-1">
                         👥 Destins

@@ -22,7 +22,7 @@ export function Footer() {
                     <h4 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">Navigation</h4>
                     <ul className="space-y-1.5 text-xs">
                         <li><Link href="/" className="hover:text-amber-400 transition inline-block py-0.5">Accueil</Link></li>
-                        <li><Link href="/galerie" className="hover:text-amber-400 transition inline-block py-0.5">Galerie des Glaces</Link></li>
+                        <li><Link href="/galerie" className="hover:text-amber-400 transition inline-block py-0.5">Galerie des Sans-Papiers</Link></li>
                         <li><Link href="/destins" className="hover:text-amber-400 transition inline-block py-0.5">Portraits & Destins</Link></li>
                         <li><Link href="/videos" className="hover:text-amber-400 transition inline-block py-0.5">Vidéos & Archives</Link></li>
                         <li><Link href="/a-propos" className="hover:text-amber-400 transition inline-block py-0.5">À Propos</Link></li>
