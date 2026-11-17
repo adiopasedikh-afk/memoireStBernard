@@ -15,31 +15,59 @@ interface VideoItem {
 
 const FALLBACK_VIDEOS: VideoItem[] = [
     {
-        id: '1',
+        id: '936ecc70-2b9a-41dd-a2a0-aad2e86866a8',
+        title: "23 août 1996, évacuation de l'église Saint Bernard",
+        youtube_id: 'aru3kVwuETs',
+        description: "Reportage d'époque du journal télévisé montrant l'intervention des forces de l'ordre (CRS forçant les portes de l'église à la hache), l'évacuation des familles et des grévistes de la faim après deux mois d'occupation, et le témoignage du père Henri Coindé.",
+        badge_date: 'Archive 1996',
+    },
+    {
+        id: 'c1d2e3f4-a5b6-7890-cdef-111111111111',
         title: 'La Ballade des sans-papiers',
         youtube_id: 'kNjVJoYhc84',
         description: 'Documentaire retraçant le mouvement des sans-papiers de Saint-Bernard.',
         badge_date: 'Archive 1996',
     },
     {
-        id: '2',
+        id: 'c3ada44a-5636-4d9f-b608-2f341ec72377',
+        title: "L'histoire des sans-papiers de Saint Bernard",
+        youtube_id: 'DhXT0moKZHc',
+        description: "Rétrospective retraçant l'ensemble du parcours des collectifs depuis la première occupation de l'église Saint-Ambroise jusqu'au refuge à l'église Saint-Bernard.",
+        badge_date: 'Archive 1996',
+    },
+    {
+        id: 'c1d2e3f4-a5b6-7890-cdef-222222222222',
         title: 'Les sans-papiers après Saint-Bernard',
         youtube_id: 'mLoafEv9Vqo',
         description: 'Reportage d’époque sur les suites du mouvement après l’évacuation.',
         badge_date: 'Archive INA',
     },
     {
-        id: '3',
+        id: '753e2433-8b7f-4b84-a7e9-d25b568eafd0',
+        title: 'Les sans-papiers de Saint Bernard retenus à Vincennes',
+        youtube_id: 'mCHtmUyj-eg',
+        description: 'Images du transfert des familles au centre de rétention administrative de Vincennes et mobilisation des avocats et des comités de soutien.',
+        badge_date: 'Archive 1996',
+    },
+    {
+        id: 'c1d2e3f4-a5b6-7890-cdef-333333333333',
         title: '2ᵉ anniversaire des sans-papiers à l\'église St-Bernard',
         youtube_id: 'lUzwQ59nzuQ',
         description: 'Rassemblement de commémoration devant l’église Saint-Bernard.',
         badge_date: 'Archive INA',
     },
     {
-        id: '4',
+        id: 'c1d2e3f4-a5b6-7890-cdef-444444444444',
         title: '30 ans de l\'occupation de l\'église Saint-Bernard',
         youtube_id: 'wlsK4MIzu1U',
         description: 'Anzoumane Sissoko sur l’histoire et l’impact de la lutte.',
+        badge_date: 'Témoignage',
+    },
+    {
+        id: '2e2e9f1e-4b2a-417c-bbd3-8aa42c29a53b',
+        title: 'Diangounte Camara un petit souvenir',
+        youtube_id: 'Mv9WVNe_mRU',
+        description: 'Témoignage et souvenir du mouvement des sans-papiers de Saint-Bernard (Diangounte Camara).',
         badge_date: 'Témoignage',
     },
 ];
