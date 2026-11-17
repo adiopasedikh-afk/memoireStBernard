@@ -7,6 +7,37 @@ export class ApiError extends Error {
 
 let csrfToken: string | null = null;
 
+function getStoredCsrfToken(): string | null {
+  if (csrfToken) return csrfToken;
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = sessionStorage.getItem('saint_bernard_csrf');
+      if (stored) {
+        csrfToken = stored;
+        return stored;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return null;
+}
+
+function setStoredCsrfToken(token: string | null): void {
+  csrfToken = token;
+  if (typeof window !== 'undefined') {
+    try {
+      if (token) {
+        sessionStorage.setItem('saint_bernard_csrf', token);
+      } else {
+        sessionStorage.removeItem('saint_bernard_csrf');
+      }
+    } catch {
+      // ignore
+    }
+  }
+}
+
 export function getApiBaseUrl(): string {
   // Sur Vercel (HTTPS), cibler directement le tunnel Cloudflare du backend local
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
@@ -28,8 +59,9 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
   if (init.body && !isFormData && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
-  if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && csrfToken) {
-    headers.set('X-CSRF-Token', csrfToken);
+  const activeCsrf = getStoredCsrfToken();
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && activeCsrf) {
+    headers.set('X-CSRF-Token', activeCsrf);
   }
 
   const response = await fetch(`${baseUrl.replace(/\/+$/, '')}${path}`, {
@@ -58,12 +90,12 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
 
   if (typeof payload === 'object' && payload !== null && 'csrfToken' in payload) {
     const token = payload.csrfToken;
-    csrfToken = typeof token === 'string' ? token : null;
+    setStoredCsrfToken(typeof token === 'string' ? token : null);
   }
 
   return payload as T;
 }
 
 export function clearApiSession(): void {
-  csrfToken = null;
+  setStoredCsrfToken(null);
 }

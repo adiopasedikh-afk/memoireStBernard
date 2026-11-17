@@ -1252,9 +1252,6 @@ try {
     }
 
     if ($method === 'POST' && $path === '/api/stripe/checkout') {
-        if (isset($_SESSION['user']) && is_array($_SESSION['user'])) {
-            requireCsrfToken();
-        }
         $body = readJsonBody();
         $amount = $body['amount'] ?? null;
         if (!is_int($amount) && !is_float($amount) && !(is_string($amount) && is_numeric($amount))) {
