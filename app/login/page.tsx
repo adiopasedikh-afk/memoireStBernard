@@ -39,7 +39,7 @@ export default function LoginPage() {
                         Accès Espace Privé
                     </h1>
                     <p className="text-xs text-slate-400">
-                        Connectez-vous avec votre e-mail et votre mot de passe.
+                        Connectez-vous avec votre e-mail et votre code PIN / mot de passe.
                     </p>
                 </div>
 
@@ -63,7 +63,7 @@ export default function LoginPage() {
 
                     <div>
                         <label className="block text-xs font-semibold text-slate-300 mb-1">
-                            Mot de passe
+                            Code PIN ou Mot de passe
                         </label>
                         <input
                             type="password"
@@ -74,6 +74,7 @@ export default function LoginPage() {
                                 setPassword(e.target.value);
                                 if (errorMsg) setErrorMsg('');
                             }}
+                            placeholder="Ex : 580869"
                             className="w-full rounded-xl bg-slate-950 border border-slate-800 px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition"
                         />
                     </div>

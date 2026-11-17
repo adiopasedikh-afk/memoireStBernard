@@ -13,8 +13,7 @@ export function getApiBaseUrl(): string {
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
       return envUrl;
     }
-    // Return empty string on HTTPS so fetch uses same-origin /api/... via Next.js rewrites
-    return '';
+    return 'https://hay-vhs-textbook-liability.trycloudflare.com';
   }
   if (envUrl) {
     return envUrl;
