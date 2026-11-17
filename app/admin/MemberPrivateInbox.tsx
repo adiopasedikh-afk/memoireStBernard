@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { apiRequest } from '@/app/lib/api';
+import { apiRequest, getApiBaseUrl } from '@/app/lib/api';
 
 interface MemberMessage { id: string; email: string; subject: string; message: string; status: 'unread' | 'read'; created_at: string }
 interface MemberUpload { id: string; email: string; title: string; original_filename: string; mime_type: string; file_size: number; status: 'new' | 'reviewed'; created_at: string }
@@ -32,7 +32,7 @@ export default function MemberPrivateInbox() {
     await load();
   };
   const download = async (id: string, name: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
+    const baseUrl = getApiBaseUrl();
     const response = await fetch(`${baseUrl}/api/admin/member/uploads/${id}/download`, { credentials: 'include' });
     if (!response.ok) throw new Error('Le téléchargement a échoué.');
     const blob = await response.blob();

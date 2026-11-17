@@ -220,7 +220,7 @@ try {
         sendJson(200, ['data' => $query->fetchAll()]);
     }
 
-    if ($method === 'GET' && preg_match('#^/api/media/(banners|carousel|contributions|gallery|destins)/([a-f0-9]{32}\.(?:jpg|png|webp|gif|pdf))$#', $path, $matches)) {
+    if (($method === 'GET' || $method === 'HEAD') && preg_match('#^/api/media/(banners|carousel|contributions|gallery|destins)/([a-f0-9]{32}\.(?:jpg|png|webp|gif|pdf))$#', $path, $matches)) {
         $category = $matches[1];
         $filename = $matches[2];
         $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
@@ -244,7 +244,9 @@ try {
         header('X-Content-Type-Options: nosniff');
         header('Cache-Control: public, max-age=31536000, immutable');
         header('Content-Disposition: ' . ($extension === 'pdf' ? 'attachment' : 'inline'));
-        readfile($file);
+        if ($method === 'GET') {
+            readfile($file);
+        }
         exit;
     }
 

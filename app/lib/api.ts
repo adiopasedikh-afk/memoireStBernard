@@ -7,11 +7,16 @@ export class ApiError extends Error {
 
 let csrfToken: string | null = null;
 
-export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!baseUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL is not configured.');
+export function getApiBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
+  if (envUrl) {
+    return envUrl;
   }
+  return 'https://hay-vhs-textbook-liability.trycloudflare.com';
+}
+
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const baseUrl = getApiBaseUrl();
 
   const method = (init.method || 'GET').toUpperCase();
   const headers = new Headers(init.headers);

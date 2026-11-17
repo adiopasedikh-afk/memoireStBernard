@@ -38,11 +38,49 @@ function envValue(string $name, ?string $default = null): ?string
     return $value === false ? $default : $value;
 }
 
+function detectBaseUrl(): string
+{
+    $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? null;
+    $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null;
+    if (!$proto && isset($_SERVER['HTTP_CF_VISITOR']) && str_contains($_SERVER['HTTP_CF_VISITOR'], 'https')) {
+        $proto = 'https';
+    }
+    if (!$proto) {
+        $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    }
+
+    if ($host && !in_array($host, ['localhost:8098', '127.0.0.1:8098', 'localhost', '127.0.0.1'], true)) {
+        return 'https://' . $host;
+    }
+
+    $envUrl = envValue('APP_BASE_URL');
+    if ($envUrl) {
+        return rtrim($envUrl, '/');
+    }
+
+    return $proto . '://' . ($host ?: '127.0.0.1:8098');
+}
+
+function normalizePayloadUrls(mixed $data, string $currentBaseUrl): mixed
+{
+    if (is_array($data)) {
+        foreach ($data as $k => $v) {
+            $data[$k] = normalizePayloadUrls($v, $currentBaseUrl);
+        }
+        return $data;
+    }
+    if (is_string($data) && str_starts_with($data, 'http://localhost:8098/api/media/')) {
+        return $currentBaseUrl . substr($data, strlen('http://localhost:8098'));
+    }
+    return $data;
+}
+
 function sendJson(int $status, array $payload): never
 {
+    $normalizedPayload = normalizePayloadUrls($payload, detectBaseUrl());
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+    echo json_encode($normalizedPayload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     exit;
 }
 
@@ -93,12 +131,34 @@ function database(): PDO
     return $pdo;
 }
 
+function isOriginAllowed(?string $origin): bool
+{
+    if ($origin === null) {
+        return true;
+    }
+
+    $rawAllowed = envValue('APP_ORIGIN', 'http://localhost:3000');
+    $allowedOrigins = array_filter(array_map('trim', explode(',', $rawAllowed)));
+
+    foreach ($allowedOrigins as $allowed) {
+        if ($origin === $allowed) {
+            return true;
+        }
+    }
+
+    $host = parse_url($origin, PHP_URL_HOST);
+    if ($host && (str_ends_with($host, '.vercel.app') || $host === 'localhost' || $host === '127.0.0.1')) {
+        return true;
+    }
+
+    return false;
+}
+
 function configureCorsAndSession(): void
 {
-    $allowedOrigin = envValue('APP_ORIGIN', 'http://localhost:3000');
     $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
 
-    if ($origin !== null && !hash_equals((string) $allowedOrigin, $origin)) {
+    if ($origin !== null && !isOriginAllowed($origin)) {
         sendJson(403, ['error' => 'Origin is not allowed.']);
     }
 
@@ -115,15 +175,20 @@ function configureCorsAndSession(): void
         exit;
     }
 
-    $secureCookie = envValue('APP_ENV', 'local') === 'production'
-        || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $isHttps = envValue('APP_ENV', 'local') === 'production'
+        || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
+    $isCrossOrigin = $origin !== null && !str_contains($origin, 'localhost') && !str_contains($origin, '127.0.0.1');
+    $sameSite = ($isHttps && $isCrossOrigin) ? 'None' : 'Lax';
+
     session_name('saint_bernard_session');
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'secure' => $secureCookie,
+        'secure' => $isHttps,
         'httponly' => true,
-        'samesite' => 'Lax',
+        'samesite' => $sameSite,
     ]);
     session_start();
 }
@@ -239,11 +304,7 @@ function saveUploadedFile(string $field, string $category, bool $allowPdf = fals
 
     $baseUrl = rtrim((string) envValue('APP_BASE_URL', ''), '/');
     if ($baseUrl === '') {
-        $storedPath = $storageDirectory . '/' . $filename;
-        if (is_file($storedPath) && !unlink($storedPath)) {
-            error_log('[Saint-Bernard API] Unable to remove an upload after configuration failure.');
-        }
-        throw new RuntimeException('APP_BASE_URL is required for file uploads.');
+        $baseUrl = detectBaseUrl();
     }
     return $baseUrl . '/api/media/' . $category . '/' . $filename;
 }
