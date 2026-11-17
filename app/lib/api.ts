@@ -9,6 +9,12 @@ let csrfToken: string | null = null;
 
 export function getApiBaseUrl(): string {
   const envUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
+    }
+    return 'https://hay-vhs-textbook-liability.trycloudflare.com';
+  }
   if (envUrl) {
     return envUrl;
   }

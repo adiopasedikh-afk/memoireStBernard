@@ -16,20 +16,28 @@ interface BannerItem {
 
 const FALLBACK_BANNERS: BannerItem[] = [
   {
-    id: 'fallback-archives',
-    title: 'Mémoires de Saint-Bernard',
-    subtitle: 'Archives, témoignages et mémoire collective',
-    image_url: '',
-    button_text: 'Découvrir les archives',
-    button_url: '/galerie',
+    id: '17ef37e9-1b82-43ab-8b31-605651af0881',
+    title: 'YouAndMe - appels prives et securises',
+    subtitle: 'Votre monde, un appel plus pres',
+    image_url: '/images/banners/4c7a1b7b0c4f4d0a8f3e2b6c9d5a1e77.png',
+    button_text: 'Decouvrir YouAndMe',
+    button_url: 'https://youandme.cloud',
   },
   {
-    id: 'fallback-goutte-dor',
-    title: 'La Goutte d’Or',
-    subtitle: 'Une histoire populaire faite de luttes et de solidarités',
-    image_url: '',
-    button_text: 'Découvrir le quartier',
-    button_url: '/goutte-dor',
+    id: '2f4b8c1e-6a7d-4d9f-a5c2-3e8b1d7f0a44',
+    title: 'YouAndMe - vos proches partout dans le monde',
+    subtitle: 'Appels audio et video directs, prives et sans conservation',
+    image_url: '/images/banners/8e5d2c4a9b7f6e1a3c0d8b5f4a2e9c66.png',
+    button_text: 'Decouvrir YouAndMe',
+    button_url: 'https://youandme.cloud',
+  },
+  {
+    id: '9fa73407-a285-4adf-bab0-b7d505401499',
+    title: 'Votre partenaire pour tous vos projets digitaux',
+    subtitle: 'Digitalisation - Archivage - OCR',
+    image_url: '/images/banners/82c425fa9efdf9d71b97053621cd09e3.png',
+    button_text: 'En savoir plus',
+    button_url: 'https://digitds.cloud',
   },
 ];
 
