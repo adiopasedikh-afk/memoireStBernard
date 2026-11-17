@@ -13,12 +13,13 @@ export function getApiBaseUrl(): string {
     if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
       return envUrl;
     }
-    return 'https://hay-vhs-textbook-liability.trycloudflare.com';
+    // Return empty string on HTTPS so fetch uses same-origin /api/... via Next.js rewrites
+    return '';
   }
   if (envUrl) {
     return envUrl;
   }
-  return 'https://hay-vhs-textbook-liability.trycloudflare.com';
+  return 'http://127.0.0.1:8098';
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {

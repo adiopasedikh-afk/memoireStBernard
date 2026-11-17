@@ -112,12 +112,22 @@ const FALLBACK_HERO_SLIDES: CarouselSlide[] = [
   },
 ];
 
+const FALLBACK_CONTRIBUTIONS: PublishedContribution[] = [
+  {
+    id: "b9433d77-5b13-476a-9c72-7767804a0748",
+    title: "IMMIGRATION ET ECONOMIE",
+    content: "sb-rich-v1:{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[{\"type\":\"text\",\"text\":\"L’impact de l’immigration dans l’économie d’un pays\",\"marks\":[{\"type\":\"bold\"}]},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"L’immigration peut contribuer à l’économie d’un pays de plusieurs façons. Son effet dépend toutefois de la situation économique, des parcours des personnes, des besoins du marché du travail et des politiques d’accueil. Il n’existe donc pas une réponse identique pour tous les pays ou toutes les périodes. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[{\"type\":\"text\",\"text\":\"Le travail et les compétences \",\"marks\":[{\"type\":\"bold\"}]}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"Les personnes immigrées travaillent dans des secteurs variés : santé, bâtiment, agriculture, restauration, recherche, services et création d’entreprises. Elles peuvent répondre à des besoins de recrutement et apporter des expériences et des qualifications nouvelles. \"},{\"type\":\"hardBreak\"},{\"type\":\"text\",\"text\":\"Certaines qualifications obtenues à l’étranger sont cependant difficiles à faire reconnaître. \"},{\"type\":\"hardBreak\"},{\"type\":\"text\",\"text\":\"Des formations et des démarches de reconnaissance plus accessibles aideraient les personnes à exercer un emploi correspondant mieux à leurs compétences. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[{\"type\":\"text\",\"text\":\"La consommation et l’activité locale\",\"marks\":[{\"type\":\"bold\"}]},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"En travaillant et en vivant dans leur pays d’accueil, les personnes immigrées consomment des biens et des services, paient des impôts et des cotisations selon leur situation, et participent à la vie économique locale. Certaines créent aussi des commerces ou des entreprises, qui peuvent générer de l’activité et des emplois. Ces effets sont plus favorables lorsque l’accès à l’emploi\"},{\"type\":\"hardBreak\"},{\"type\":\"text\",\"text\":\"déclaré, au financement et à l’accompagnement est réel. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[{\"type\":\"text\",\"text\":\"Les difficultés à prendre en compte \",\"marks\":[{\"type\":\"bold\"}]}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"L’arrivée de nouvelles personnes peut aussi accroître les besoins en logements, en cours de langue, en écoles ou en services publics, surtout quand les moyens ne suivent pas. La précarité administrative, la discrimination et l’exploitation au travail freinent l’intégration professionnelle et nuisent à l’ensemble de la société. \"},{\"type\":\"hardBreak\"},{\"type\":\"text\",\"text\":\"Ces difficultés ne sont pas une fatalité : elles dépendent aussi des politiques de logement, d’emploi, de formation et d’accès aux droits. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[{\"type\":\"text\",\"text\":\"Une question de choix collectifs\",\"marks\":[{\"type\":\"bold\"}]},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":\"center\"},\"content\":[]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"Pour évaluer l’impact économique de l’immigration, il faut regarder les conditions de travail, les contributions et les besoins dans la durée, plutôt que s’en tenir à des idées générales. Un accès plus rapide à la langue, à la formation, à la reconnaissance des diplômes et à un emploi digne peut aider chacun à participer pleinement. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"L’immigration ne constitue ni une solution automatique à tous les problèmes économiques, ni une charge par nature. Ses effets dépendent beaucoup de la manière dont un pays organise l’accueil, protège les travailleurs et permet à chacun de contribuer. \"}]},{\"type\":\"paragraph\",\"attrs\":{\"textAlign\":null},\"content\":[{\"type\":\"text\",\"text\":\"Ce texte propose une synthèse générale et ne remplace pas une étude fondée sur des données propres à un pays ou à une période précise.\"}]}]}",
+    file_url: "/contributions/da3b33e7819e386234353e26c6231a85.pdf",
+    created_at: "2026-11-05 13:28:48",
+  },
+];
+
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [heroSlides, setHeroSlides] = useState<CarouselSlide[]>(FALLBACK_HERO_SLIDES);
   const [carouselPaused, setCarouselPaused] = useState(false);
-  const [publishedContributions, setPublishedContributions] = useState<PublishedContribution[]>([]);
-  const [contributionsLoading, setContributionsLoading] = useState(true);
+  const [publishedContributions, setPublishedContributions] = useState<PublishedContribution[]>(FALLBACK_CONTRIBUTIONS);
+  const [contributionsLoading, setContributionsLoading] = useState(false);
   const [contributionsError, setContributionsError] = useState('');
 
   useEffect(() => {
@@ -156,9 +166,12 @@ export default function HomePage() {
     async function loadPublishedContributions() {
       try {
         const result = await apiRequest<{ data: PublishedContribution[] }>('/api/contributions');
-        if (!cancelled) setPublishedContributions(result.data);
-      } catch (error) {
         if (!cancelled) {
+          setPublishedContributions(result.data.length > 0 ? result.data : FALLBACK_CONTRIBUTIONS);
+          setContributionsError('');
+        }
+      } catch (error) {
+        if (!cancelled && publishedContributions.length === 0) {
           setContributionsError(
             error instanceof Error ? error.message : 'Impossible de charger les contributions publiées.',
           );
