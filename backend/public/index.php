@@ -1264,9 +1264,11 @@ try {
         if ($amountInCents < 100 || $amountInCents > 99999999) {
             sendJson(400, ['error' => 'The donation amount must be between 1 and 999999.99 EUR.']);
         }
-        $frontendUrl = rtrim((string) envValue('APP_FRONTEND_URL', ''), '/');
-        if ($frontendUrl === '') {
-            throw new RuntimeException('APP_FRONTEND_URL is not configured.');
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? null;
+        if ($origin && isOriginAllowed($origin)) {
+            $frontendUrl = rtrim($origin, '/');
+        } else {
+            $frontendUrl = rtrim((string) envValue('APP_FRONTEND_URL', 'http://localhost:3000'), '/');
         }
 
         $donorEmail = null;
