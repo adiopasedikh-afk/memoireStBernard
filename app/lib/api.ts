@@ -8,14 +8,12 @@ export class ApiError extends Error {
 let csrfToken: string | null = null;
 
 export function getApiBaseUrl(): string {
-  const envUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
+  // Sur Vercel (HTTPS), cibler directement le tunnel Cloudflare du backend local
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-      return envUrl;
-    }
     return 'https://hay-vhs-textbook-liability.trycloudflare.com';
   }
-  if (envUrl) {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
     return envUrl;
   }
   return 'http://127.0.0.1:8098';

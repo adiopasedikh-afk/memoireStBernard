@@ -19,7 +19,7 @@ export default function LoginPage() {
         try {
             const result = await apiRequest<{ user: { role: string } }>('/api/auth/login', {
                 method: 'POST',
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email: email.trim(), password: password.trim() }),
             });
 
             router.push(result.user.role === 'admin' ? '/admin' : '/dashboard');
