@@ -39,9 +39,9 @@ function setStoredCsrfToken(token: string | null): void {
 }
 
 export function getApiBaseUrl(): string {
-  // Sur Vercel (HTTPS), cibler directement le tunnel Cloudflare du backend local
+  // Sur Vercel (HTTPS), cibler directement le backend permanent sur le VPS
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-    return 'https://hay-vhs-textbook-liability.trycloudflare.com';
+    return 'https://bdsaintbernard.youandme.cloud';
   }
   const envUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '');
   if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {

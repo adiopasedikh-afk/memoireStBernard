@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const BACKEND_TUNNEL_URL = process.env.BACKEND_API_URL || 'https://hay-vhs-textbook-liability.trycloudflare.com';
+const BACKEND_TUNNEL_URL = process.env.BACKEND_API_URL || 'https://bdsaintbernard.youandme.cloud';
 
 const nextConfig: NextConfig = {
   async rewrites() {
